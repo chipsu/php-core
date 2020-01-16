@@ -1,0 +1,24 @@
+{
+  "name": "metrica/php-core",
+  "description": "Lightweight PHP Framework",
+  "type": "library",
+  "authors": [
+    {
+      "name": "chips",
+      "email": "chips@metrica.se"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "metrica\\core\\": "src/"
+    }
+  },
+  "require-dev": {
+    "peridot-php/peridot": "^1.19"
+  },
+  "config": {
+    "platform": {
+      "php": "7.4"
+    }
+  }
+}
