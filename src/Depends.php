@@ -92,7 +92,7 @@ class Depends implements DependsInterface
       $params = $this->resolveParameterInstances($reflectionMethod->getParameters(), $extraParams);
       return $reflectionMethod->invokeArgs($params);
     }
-    throw new Exception('Component ' . $name . ' constructor is not valid');
+    throw new Exception('Component ' . $name . ' constructor is not valid: ' . var_export($constructor, true));
   }
 
   protected function isSameType($param, $type): bool
