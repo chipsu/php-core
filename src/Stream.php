@@ -15,6 +15,6 @@ class Stream implements StreamInterface {
   }
 
   public function getContent(): string {
-    return stream_get_contents($this->handle);
+    return stream_get_contents($this->getHandle());
   }
 }

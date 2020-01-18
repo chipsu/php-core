@@ -2,11 +2,13 @@
 
 namespace metrica\core;
 
+use Throwable;
+
 class HttpException extends Exception
 {
   private ?int $httpStatus;
 
-  public function __construct(int $httpStatus, $message = null, $previous = null)
+  public function __construct(int $httpStatus, ?string $message = null, ?Throwable $previous = null)
   {
     $this->httpStatus = $httpStatus;
     parent::__construct($message ?? $httpStatus . ' - ' . $this->getHttpMessage(), 0, $previous);

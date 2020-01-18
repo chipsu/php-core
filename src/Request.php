@@ -145,7 +145,7 @@ class Request implements RequestInterface
       if(isset($this->bodyParsers[$contentType])) {
         $parser = $this->bodyParsers[$contentType];
         $this->bodyParams = $parser($this->getBodyContent(), function($data, $error, $message) {
-          throw new HttpException(400, 'Invalid body: %s', $message);
+          throw new HttpException(400, 'Error parsing body: ' . $message);
         });
       } else if($this->getMethod() === static::METHOD_POST) {
         $this->bodyParams = $_POST; // FIXME

@@ -35,7 +35,10 @@ class Response implements ResponseInterface {
   }
 
   public function write($data): ResponseInterface {
-    if(is_bool($data)) {
+    if(is_int($data)) {
+      $this->setStatus($data);
+      $data = null;
+    } else if(is_bool($data)) {
       $this->setStatus($data ? 204 : 500);
       $data = null;
     } else if(is_object($data) || is_array($data)) {
