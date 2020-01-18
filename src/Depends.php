@@ -123,19 +123,24 @@ class Depends implements DependsInterface
     return $type === null || $type->getName() === gettype($param) || is_a($param, $type->getName(), true);
   }
 
+  protected function requireParamType($name, $param, $type)
+  {
+    if(!$this->isSameType($param, $type)) {
+      throw new Exception('Incompatible type for parameter ' . $name . ', should be ' . gettype($param));
+    }
+    return $param;
+  }
+
   protected function resolveParameterInstances(array $params, array $extraParams): array
   {
     return array_map(function($param) use($extraParams) {
       $name = $param->name;
       $type = $param->getType();
-      if(isset($extraParams[$name]) && $this->isSameType($extraParams[$name], $type)) {
-        return $extraParams[$name];
+      if(isset($extraParams[$name])) {
+        return $this->requireParamType($name, $extraParams[$name], $type);
       } else if($this->has($name)) {
         $instance = $this->get($name);
-        if(!$this->isSameType($instance, $type)) {
-          throw new Exception('Incompatible type for parameter ' . $name);
-        }
-        return $instance;
+        return $this->requireParamType($name, $instance, $type);
       } else if(!$param->isOptional()) {
         throw new Exception('Missing required component for parameter ' . $name);
       }
