@@ -86,8 +86,7 @@ class Router implements RouterInterface {
     return null;
   }
 
-  // TODO: DI extra args?
-  public function invokeRequest(RequestInterface $request, ?int $throwHttpError = 404, $default = null) {
+  public function invokeRequest(RequestInterface $request, array $extraParams = [], ?int $throwHttpError = 404, $default = null) {
     $routeMatch = $this->getRouteMatch($request);
 
     if(!$routeMatch) {
@@ -98,6 +97,6 @@ class Router implements RouterInterface {
       }
     }
 
-    return $routeMatch['route']->invokeRequest($request, $routeMatch['match']);
+    return $routeMatch['route']->invokeRequest($request, array_merge($routeMatch['match'], $extraParams));
   }
 }

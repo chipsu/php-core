@@ -15,5 +15,5 @@ interface RouterInterface {
   public function setRoutes(array $routes): RouterInterface;
   public function getRoute(RequestInterface $request): ?RouteInterface;
   public function getRouteMatch(RequestInterface $request): ?array;
-  public function invokeRequest(RequestInterface $request, ?int $throwHttpError = 404, $default = null);
+  public function invokeRequest(RequestInterface $request, array $extraParams = [], ?int $throwHttpError = 404, $default = null);
 }
