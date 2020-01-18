@@ -7,11 +7,15 @@ class Route implements RouteInterface {
   protected string $pattern;
   protected $callback;
   protected ?string $regex = null;
+  protected ?EventsInterface $events = null;
+  protected ?DependsInterface $depends = null;
 
-  public function __construct(array $methods, string $pattern, $callback) {
+  public function __construct(array $methods, string $pattern, $callback, ?EventsInterface $events = null, ?DependsInterface $depends = null) {
     $this->methods = $methods;
     $this->pattern = $pattern;
     $this->callback = $callback;
+    $this->events = $events;
+    $this->depends = $depends;
   }
 
   public function getMethods(): array {
@@ -62,10 +66,9 @@ class Route implements RouteInterface {
 
   public function invokeRequest($request, array $extraParams = []) {
     $args = [];
-    $events = null;
-    #$router = $this->getRouter();
+    $events = $this->events;
+    $depends = $this->depends;
     $callback = $this->getCallback();
-    #$kernel = $router->getKernel();
 
     if($extraParams) {
       $request = clone $request;
@@ -94,10 +97,13 @@ class Route implements RouteInterface {
         # $kernel,
         $request];
     }); */
+    if($depends) {
+      $args = $depends->params($callback, array_merge($request->getQueryParams(), ['request' => $request]));
+    } else {
+      $args = [$request];
+    }
 
-    $args = [$request];
-
-    $events = is_array($callback) && $callback[0] instanceof Component ? $callback[0]->getEvents() : null;
+    # TODO: Fix events
     $eventData = $events ? new \ArrayObject([
       'route' => $this,
       'component' => $callback[0],

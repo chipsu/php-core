@@ -50,6 +50,8 @@ class Bootstrap {
   ];
 
   public function di(array $extraDependencies = []) {
-    return new Depends(array_merge(static::$defaultDependencies, $extraDependencies));
+    $di = new Depends(array_merge(static::$defaultDependencies, $extraDependencies));
+    $di->addInstance('depends', $di);
+    return $di;
   }
 }

@@ -6,11 +6,15 @@ class Router implements RouterInterface {
   protected array $routes;
   protected string $routeClass;
   protected ?CacheInterface $cache;
+  protected ?EventsInterface $events;
+  protected ?DependsInterface $depends;
 
-  public function __construct(array $routes = [], ?string $routeClass = null, ?CacheInterface $cache = null) {
+  public function __construct(array $routes = [], ?string $routeClass = null, ?CacheInterface $cache = null, ?EventsInterface $events = null, ?DependsInterface $depends = null) {
     $this->routes = $routes;
     $this->routeClass = $routeClass ?? __NAMESPACE__ . '\Route';
     $this->cache = $cache;
+    $this->events = $events;
+    $this->depends = $depends;
   }
 
   public function get(string $pattern, $callback): RouterInterface {
@@ -35,7 +39,7 @@ class Router implements RouterInterface {
 
   public function on(array $methods, string $pattern, $callback): RouterInterface {
     $class = $this->routeClass;
-    $this->routes[] = new $class($methods, $pattern, $callback);
+    $this->routes[] = new $class($methods, $pattern, $callback, $this->events, $this->depends);
     return $this;
   }
 
