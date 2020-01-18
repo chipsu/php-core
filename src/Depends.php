@@ -2,6 +2,8 @@
 
 namespace metrica\core;
 
+use InvalidArgumentException;
+
 class Depends implements DependsInterface
 {
   protected array $components = [];
@@ -38,7 +40,7 @@ class Depends implements DependsInterface
 
   public function has(string $name): bool
   {
-    return isset($this->components[$name]);
+    return isset($this->components[$name]) || isset($this->instances[$name]);
   }
 
   public function add(string $name, string $class): DependsInterface
@@ -49,6 +51,15 @@ class Depends implements DependsInterface
   public function addConstructor(string $name, callable $constructor): DependsInterface
   {
     return $this->addComponent($name, $constructor);
+  }
+
+  public function addInstance(string $name, object $instance): DependsInterface
+  {
+    if(isset($this->instances[$name])) {
+      throw new Exception('Component ' . $name . ' is already registered');
+    }
+    $this->instances[$name] = $instance;
+    return $instance;
   }
 
   protected function addComponent(string $name, $value): DependsInterface
@@ -93,6 +104,18 @@ class Depends implements DependsInterface
       return $reflectionMethod->invokeArgs($params);
     }
     throw new Exception('Component ' . $name . ' constructor is not valid: ' . var_export($constructor, true));
+  }
+
+  public function params($callable, array $extraParams = []): array
+  {
+    if(is_array($callable)) {
+      $reflectionMethod = new \ReflectionMethod($callable[0], $callable[1]);
+    } else if(is_callable($callable)) {
+      $reflectionMethod = new \ReflectionFunction($callable);
+    } else {
+      throw new InvalidArgumentException('Unsupported $callable');
+    }
+    return $this->resolveParameterInstances($reflectionMethod->getParameters(), $extraParams);
   }
 
   protected function isSameType($param, $type): bool
