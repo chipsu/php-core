@@ -78,7 +78,7 @@ class Request implements RequestInterface
     return $this->method;
   }
 
-  public function getContentType(): string
+  public function getContentType(): ?string
   {
     return $this->getHeader('Content-Type');
   }
@@ -168,7 +168,7 @@ class Request implements RequestInterface
     if($result = $this->getQueryParam($key)) {
       return $result;
     }
-    return $this->ContentParam($key, $default);
+    return $this->getBodyParam($key, $default);
   }
 
   public function __toString(): string
