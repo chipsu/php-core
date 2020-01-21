@@ -66,8 +66,6 @@ class Route implements RouteInterface {
 
   public function invokeRequest($request, array $extraParams = []) {
     $args = [];
-    $events = $this->events;
-    $depends = $this->depends;
     $callback = $this->getCallback();
 
     if($extraParams) {
@@ -83,48 +81,39 @@ class Route implements RouteInterface {
       }, $callback);
     }
 
-    /* $args = $router->getArgumentGenerator()->createMethodArgs($callback, function() use(
-      # $kernel,
-      $request) {
-      return array_merge($request->getQueryParams(), [
-        'route' => $this,
-        #'kernel' => $kernel,
-        'request' => $request,
-        'query' => $request->getQueryParams(),
-      ]);
-    }, function() use($args, $kernel, $request) {
-      return $args + [
-        # $kernel,
-        $request];
-    }); */
-    if($depends) {
-      $args = $depends->params($callback, array_merge($request->getQueryParams(), ['request' => $request]));
+    if($this->depends) {
+      $args = $this->depends->params($callback, array_merge($request->getQueryParams(), ['request' => $request]));
     } else {
       $args = [$request];
     }
 
-    # TODO: Fix events
-    $eventData = $events ? new \ArrayObject([
-      'route' => $this,
-      'component' => $callback[0],
-      'method' => $callback[1],
-      'returnValue' => null,
-    ]) : null;
+    if($this->events) {
+      $eventData = $this->events->data([
+        'route' => $this,
+        'request' => $request,
+        'extraParams' => $extraParams,
+        'events' => $this->events,
+        'depends' => $this->depends,
+        'args' => $args,
+        'callback' => $callback,
+        'returnValue' => null,
+      ]);
 
-    if($events && !$events->fire('beforeInvoke', $eventData)) {
-      return $eventData['returnValue'];
-    }
-
-    $result = call_user_func_array($callback, $args);
-
-    if($events) {
-      $eventData['result'] = $result;
-      if(!$events->fire('afterInvoke', $eventData)) {
+      if(!$this->events->fire('beforeRoute', $eventData)) {
         return $eventData['returnValue'];
       }
     }
 
-    return $result;
+    $returnValue = call_user_func_array($callback, $args);
+
+    if($this->events) {
+      $eventData['returnValue'] = $returnValue;
+      if(!$this->events->fire('afterRoute', $eventData)) {
+        return $eventData['returnValue'];
+      }
+    }
+
+    return $returnValue;
   }
 
   protected function compilePattern($source): string {

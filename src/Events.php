@@ -2,10 +2,14 @@
 
 namespace metrica\core;
 
-class Events implements EventsInterface {
+use ArrayObject;
+
+class Events implements EventsInterface
+{
   protected $listeners;
 
-  public function __construct(array $listeners = []) {
+  public function __construct(array $listeners = [])
+  {
     $this->listeners = $listeners;
   }
 
@@ -14,9 +18,14 @@ class Events implements EventsInterface {
     $this->listeners[$name][] = $callback;
   }
 
+  public function data(array $data): ArrayObject
+  {
+    return new ArrayObject($data);
+  }
+
   public function fire(string $name, iterable $params = [])
   {
-    if(!isset($this->listeners[$name])) {
+    if (!isset($this->listeners[$name])) {
       return true;
     }
 
@@ -25,9 +34,9 @@ class Events implements EventsInterface {
       'params' => $params,
     ]);
 
-    foreach($this->listeners[$name] as $callback) {
+    foreach ($this->listeners[$name] as $callback) {
       throw new \Exception('FIX THIS! Use DI?');
-      if($argumentGenerator = $this->getArgumentGenerator()) {
+      if ($argumentGenerator = $this->getArgumentGenerator()) {
         /* $params = is_array($event->params) ? $event->params : (array)$event->params;
         $args = $argumentGenerator->createMethodArgs($callback, array_merge($params, [
           'event' => $event,
@@ -38,7 +47,7 @@ class Events implements EventsInterface {
 
       $result = call_user_func_array($callback, $args);
 
-      if($result === false) {
+      if ($result === false) {
         return false;
       }
     }
