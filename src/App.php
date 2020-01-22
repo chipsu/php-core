@@ -43,7 +43,18 @@ class App implements AppInterface {
         $this->response->write($responseData);
       }
     } catch(HttpException $error) {
-      $this->response->setStatus($error->getHttpStatus())->write($error->getMessage());
+      if($this->events) {
+        $eventData = $this->events->data([
+          'app' => $this,
+          'router' => $this->router,
+          'request' => $this->request,
+          'response' => $this->response,
+          'events' => $this->events,
+          'error' => $error,
+        ]);
+        $this->events->fire('error', $eventData);
+      }
+      throw $error;
     }
   }
 }

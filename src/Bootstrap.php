@@ -12,7 +12,7 @@ class Bootstrap
     'response' => Response::class,
   ];
 
-  public function di(array $extraDependencies = [])
+  public static function di(array $extraDependencies = [])
   {
     $di = new Depends(array_merge(static::$defaultDependencies, $extraDependencies));
     $di->addInstance('depends', $di);

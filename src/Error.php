@@ -40,23 +40,7 @@ class Error {
     }
     error_log($exception);
     $accept = isset($_SERVER['HTTP_ACCEPT']) ? explode(',', $_SERVER['HTTP_ACCEPT']) : ['text/plain'];
-    $error = [
-      'file' => basename($exception->getFile()),
-      'line' => $exception->getLine(),
-      'message' => $exception->getMessage(),
-    ];
-    if(defined('HI_DEBUG') && HI_DEBUG) {
-      $error['summary'] = (string)$exception;
-      $error['trace'] = [];
-      foreach($exception->getTrace() as $trace) {
-        $error['trace'][] = $trace;
-      }
-    } else {
-      $error['summary'] = sprintf(
-        '%3$s in %1$s on line %2$d',
-        $error['file'], $error['line'], $error['message']
-      );
-    }
+    $error = $exception instanceof Exception ? $exception->getResponseData() : Exception::defaultResponseData($exception);
     switch($accept[0]) {
     case 'text/html':
       if(!headers_sent()) {
@@ -65,27 +49,21 @@ class Error {
       echo '<!DOCTYPE HTML>';
       echo '<html><body>';
       echo '<h1>Error in application</h1>';
-      if(defined('HI_DEBUG') && HI_DEBUG) {
-        echo '<pre style="width:100%;white-space:pre-wrap">';
-        var_dump($error['summary']);
-        echo '</pre>';
-      } else {
-        echo '<p>' . htmlentities($error['summary']) . '</p>';
-      }
+      echo '<p>' . htmlentities($error['message']) . '</p>';
       echo '</body></html>';
       break;
     case 'application/json':
       if(!headers_sent()) {
         header('Content-Type: application/json');
       }
-      echo json_encode(['$error' => $error]);
+      echo json_encode($error);
       break;
     case 'text/plain':
     default:
       if(!headers_sent()) {
         header('Content-Type: text/plain');
       }
-      echo $error['summary'];
+      echo $error['message'];
       break;
     }
   }
