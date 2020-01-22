@@ -16,7 +16,7 @@ class Env implements EnvInterface {
   }
 
   public static function fromPhp(): EnvInterface {
-    return static::fromArray($_SERVER);
+    return static::fromArray($_ENV + $_SERVER);
   }
 
   public static function fromArray(array $params): EnvInterface {
