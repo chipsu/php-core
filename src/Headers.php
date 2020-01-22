@@ -5,7 +5,7 @@ namespace metrica\core;
 class Headers extends Params implements HeadersInterface {
   protected array $headers;
 
-  public function fromArray(array $params): HeadersInterface {
+  public static function fromArray(array $params): HeadersInterface {
     $result = [];
     foreach($params as $key => $value) {
       if(substr($key, 0, 5) === 'HTTP_') {
@@ -15,7 +15,7 @@ class Headers extends Params implements HeadersInterface {
     return new static($result, \CASE_LOWER);
   }
 
-  public function fromEnv(EnvInterface $env): HeadersInterface {
+  public static function fromEnv(EnvInterface $env): HeadersInterface {
     return static::fromArray($env->all());
   }
 
