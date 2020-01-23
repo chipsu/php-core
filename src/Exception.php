@@ -4,7 +4,7 @@ namespace metrica\core;
 
 class Exception extends \Exception
 {
-  public static function defaultResponseData(\Exception $exception): array
+  public static function defaultResponseData(\Throwable $exception): array
   {
     return [
       'code' => $exception->getCode(),
@@ -16,6 +16,6 @@ class Exception extends \Exception
 
   public function getResponseData(): array
   {
-    return static::defaultResponseData($exception);
+    return static::defaultResponseData($this);
   }
 }

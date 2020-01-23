@@ -49,7 +49,7 @@ class Error {
       echo '<!DOCTYPE HTML>';
       echo '<html><body>';
       echo '<h1>Error in application</h1>';
-      echo '<p>' . htmlentities($error['message']) . '</p>';
+      echo '<p>' . htmlentities(json_encode($error)) . '</p>';
       echo '</body></html>';
       break;
     case 'application/json':
@@ -63,7 +63,7 @@ class Error {
       if(!headers_sent()) {
         header('Content-Type: text/plain');
       }
-      echo $error['message'];
+      echo json_encode($error);
       break;
     }
   }
